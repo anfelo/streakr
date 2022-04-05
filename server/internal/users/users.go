@@ -1,4 +1,4 @@
-package user
+package users
 
 import (
 	"context"
@@ -18,6 +18,7 @@ type User struct {
 	LastName  string
 	Email     string
 	Password  string
+	Role      string
 }
 
 // Store - the main interface that describes
