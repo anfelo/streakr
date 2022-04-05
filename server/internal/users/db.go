@@ -36,22 +36,34 @@ func NewDatabase(ctx context.Context) (*Database, error) {
 func (d *Database) GetUserByID(ctx context.Context, userID string) (User, error) {
 	doc, err := d.userDocumentRef(userID).Get(ctx)
 	if err != nil && status.Code(err) != codes.NotFound {
-		fmt.Printf("error fetching user: %v", err)
 		return User{}, err
 	}
 	if err != nil && status.Code(err) == codes.NotFound {
-		fmt.Printf("error user not found: %v", err)
-		return User{}, nil
+		return User{}, err
 	}
 
-	fmt.Printf("user doc: %v", doc)
 	var user User
 	err = doc.DataTo(&user)
 	if err != nil {
 		return User{}, err
 	}
-	fmt.Printf("user model: %v", user)
+	user.ID = doc.Ref.ID
 	return user, nil
+}
+
+// CreateUser
+func (d *Database) CreateUser(ctx context.Context, user User) (User, error) {
+	return User{}, nil
+}
+
+// UpdateUser
+func (d *Database) UpdateUser(ctx context.Context, userID string, user User) (User, error) {
+	return User{}, nil
+}
+
+// DeleteUser
+func (d *Database) DeleteUser(ctx context.Context, userID string) error {
+	return nil
 }
 
 func (db *Database) usersCollection() *firestore.CollectionRef {

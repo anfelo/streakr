@@ -13,9 +13,15 @@ func Run() error {
 	fmt.Println("Starting up our application")
 
 	ctx := context.Background()
-	_, err := users.NewDatabase(ctx)
+	db, err := users.NewDatabase(ctx)
 	if err != nil {
 		fmt.Println("Failed to connect to the database")
+		return err
+	}
+
+	userService := users.NewService(db)
+	httpHandler := users.NewHandler(userService)
+	if err := httpHandler.Serve(); err != nil {
 		return err
 	}
 
