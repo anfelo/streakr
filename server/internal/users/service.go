@@ -2,10 +2,10 @@ package users
 
 import (
 	"context"
-	"encoding/json"
-	"log"
 	"net/http"
 
+	"github.com/anfelo/streakr/server/internal/common/transport/errors"
+	transportHTTP "github.com/anfelo/streakr/server/internal/common/transport/http"
 	"github.com/gorilla/mux"
 )
 
@@ -22,20 +22,19 @@ func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		restErr := errors.NewBadRequestError("invalid user id")
+		transportHTTP.RespondJson(w, restErr.Status, restErr)
 		return
 	}
 
 	user, err := h.Service.GetUserByID(r.Context(), id)
 	if err != nil {
-		log.Print(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		restErr := errors.NewNotFoundError("user not found")
+		transportHTTP.RespondJson(w, restErr.Status, restErr)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(user); err != nil {
-		panic(err)
-	}
+	transportHTTP.RespondJson(w, http.StatusOK, user)
 }
 
 // CreateUser

@@ -3,7 +3,8 @@ package users
 import (
 	"context"
 	"errors"
-	"fmt"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -47,7 +48,7 @@ func NewService(store Store) *Service {
 func (s *Service) GetUserByID(ctx context.Context, ID string) (User, error) {
 	usr, err := s.Store.GetUserByID(ctx, ID)
 	if err != nil {
-		fmt.Println("error fetching user by id")
+		log.Error("error fetching user by id")
 		return User{}, ErrFetchingUser
 	}
 	return usr, nil
@@ -57,7 +58,7 @@ func (s *Service) GetUserByID(ctx context.Context, ID string) (User, error) {
 func (s *Service) CreateUser(ctx context.Context, newUsr User) (User, error) {
 	insertedUsr, err := s.Store.CreateUser(ctx, newUsr)
 	if err != nil {
-		fmt.Println("error creating user")
+		log.Error("error creating user")
 		return User{}, err
 	}
 	return insertedUsr, nil
@@ -71,7 +72,7 @@ func (s *Service) UpdateUser(
 ) (User, error) {
 	updatedUsr, err := s.Store.UpdateUser(ctx, ID, updatedUsr)
 	if err != nil {
-		fmt.Println("error updating user")
+		log.Error("error updating user")
 		return User{}, err
 	}
 	return updatedUsr, nil

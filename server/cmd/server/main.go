@@ -5,12 +5,24 @@ import (
 	"fmt"
 
 	"github.com/anfelo/streakr/server/internal/users"
+	log "github.com/sirupsen/logrus"
 )
+
+// App - contain application information
+type App struct {
+	Name    string
+	Version string
+}
 
 // Run - Responsible for the instantiation
 // and startup of our go application
-func Run() error {
-	fmt.Println("Starting up our application")
+func (a *App) Run() error {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.WithFields(
+		log.Fields{
+			"AppName":    a.Name,
+			"AppVersion": a.Version,
+		}).Info("Setting up application")
 
 	ctx := context.Background()
 	db, err := users.NewDatabase(ctx)
@@ -29,8 +41,14 @@ func Run() error {
 }
 
 func main() {
-	fmt.Println("Streakr REST API")
-	if err := Run(); err != nil {
-		fmt.Println(err)
+	log.Info("Streakr REST API")
+	app := App{
+		Name:    "Streakr App",
+		Version: "1.0.0",
+	}
+
+	if err := app.Run(); err != nil {
+		log.Error("Error starting up our Web App")
+		log.Fatal(err)
 	}
 }

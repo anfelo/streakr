@@ -2,13 +2,13 @@ package users
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/anfelo/streakr/server/internal/common/transport/logs"
 	"github.com/gorilla/mux"
 )
 
@@ -23,6 +23,7 @@ func NewHandler(service UserService) *Handler {
 		Service: service,
 	}
 	h.Router = mux.NewRouter()
+	h.Router.Use(logs.LoggingMiddleware)
 	h.mapRoutes()
 
 	h.Server = &http.Server{
@@ -34,10 +35,6 @@ func NewHandler(service UserService) *Handler {
 }
 
 func (h *Handler) mapRoutes() {
-	h.Router.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello World")
-	})
-
 	h.Router.HandleFunc("/api/v1/users/{id}", h.GetUserByID).Methods("GET")
 }
 
