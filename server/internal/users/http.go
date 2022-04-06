@@ -36,6 +36,9 @@ func NewHandler(service UserService) *Handler {
 
 func (h *Handler) mapRoutes() {
 	h.Router.HandleFunc("/api/v1/users/{id}", h.GetUserByID).Methods("GET")
+	h.Router.HandleFunc("/api/v1/users", h.CreateUser).Methods("POST")
+	h.Router.HandleFunc("/api/v1/users/{id}", h.UpdateUser).Methods("PUT")
+	h.Router.HandleFunc("/api/v1/users/{id}", h.DeleteUser).Methods("DELETE")
 }
 
 func (h *Handler) Serve() error {

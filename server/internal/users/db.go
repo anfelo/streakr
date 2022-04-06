@@ -12,10 +12,10 @@ import (
 
 // UserDocument - struct that defines the firebase user document model
 type UserDocument struct {
-	FirstName string
-	LastName  string
-	Email     string
-	Role      string
+	FirstName string `firestore:"firstName"`
+	LastName  string `firestore:"lastName"`
+	Email     string `firestore:"email"`
+	Role      string `firestore:"role"`
 }
 
 // Database - struct that defines the users db
@@ -51,17 +51,56 @@ func (d *Database) GetUserByID(ctx context.Context, userID string) (User, error)
 	return user, nil
 }
 
-// CreateUser
+// CreateUser - method that creates a new user document
 func (d *Database) CreateUser(ctx context.Context, user User) (User, error) {
-	return User{}, nil
+	newDocRef := d.usersCollection().NewDoc()
+	userDoc := UserDocument{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Role:      user.Role,
+	}
+	_, err := newDocRef.Create(ctx, userDoc)
+	if err != nil {
+		return User{}, err
+	}
+
+	user.ID = newDocRef.ID
+	return user, nil
 }
 
-// UpdateUser
-func (d *Database) UpdateUser(ctx context.Context, userID string, user User) (User, error) {
-	return User{}, nil
+// UpdateUser - method that updates a user document
+func (d *Database) UpdateUser(
+	ctx context.Context,
+	userID string,
+	user User,
+) (User, error) {
+	docRef := d.userDocumentRef(userID)
+	doc, err := docRef.Get(ctx)
+	if err != nil && status.Code(err) != codes.NotFound {
+		return User{}, err
+	}
+	if err != nil && status.Code(err) == codes.NotFound {
+		return User{}, err
+	}
+
+	var userDoc UserDocument
+	err = doc.DataTo(&userDoc)
+	if err != nil {
+		return User{}, err
+	}
+
+	userDoc.FirstName = user.FirstName
+	userDoc.LastName = user.LastName
+	_, err = docRef.Set(ctx, userDoc)
+	if err != nil {
+		return User{}, err
+	}
+
+	return user, nil
 }
 
-// DeleteUser
+// DeleteUser - method that deletes a user document
 func (d *Database) DeleteUser(ctx context.Context, userID string) error {
 	return nil
 }
