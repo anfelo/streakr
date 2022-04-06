@@ -80,5 +80,9 @@ func (s *Service) UpdateUser(
 
 // DeleteUser - deletes a user by its id
 func (s *Service) DeleteUser(ctx context.Context, ID string) error {
-	return s.Store.DeleteUser(ctx, ID)
+	if err := s.Store.DeleteUser(ctx, ID); err != nil {
+		log.Error("error deleting user")
+		return err
+	}
+	return nil
 }

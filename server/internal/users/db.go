@@ -34,8 +34,8 @@ func NewDatabase(ctx context.Context) (*Database, error) {
 }
 
 // GetUserByID - method that returns a user by id from the db
-func (d *Database) GetUserByID(ctx context.Context, userID string) (User, error) {
-	doc, err := d.userDocumentRef(userID).Get(ctx)
+func (db *Database) GetUserByID(ctx context.Context, userID string) (User, error) {
+	doc, err := db.userDocumentRef(userID).Get(ctx)
 	if err != nil && status.Code(err) != codes.NotFound {
 		return User{}, err
 	}
@@ -52,8 +52,8 @@ func (d *Database) GetUserByID(ctx context.Context, userID string) (User, error)
 }
 
 // CreateUser - method that creates a new user document
-func (d *Database) CreateUser(ctx context.Context, user User) (User, error) {
-	newDocRef := d.userDocumentRef(user.ID)
+func (db *Database) CreateUser(ctx context.Context, user User) (User, error) {
+	newDocRef := db.userDocumentRef(user.ID)
 	userDoc := UserDocument{
 		ID:        user.ID,
 		FirstName: user.FirstName,
@@ -70,12 +70,12 @@ func (d *Database) CreateUser(ctx context.Context, user User) (User, error) {
 }
 
 // UpdateUser - method that updates a user document
-func (d *Database) UpdateUser(
+func (db *Database) UpdateUser(
 	ctx context.Context,
 	userID string,
 	user User,
 ) (User, error) {
-	docRef := d.userDocumentRef(userID)
+	docRef := db.userDocumentRef(userID)
 	doc, err := docRef.Get(ctx)
 	if err != nil && status.Code(err) != codes.NotFound {
 		return User{}, err
@@ -101,7 +101,19 @@ func (d *Database) UpdateUser(
 }
 
 // DeleteUser - method that deletes a user document
-func (d *Database) DeleteUser(ctx context.Context, userID string) error {
+func (db *Database) DeleteUser(ctx context.Context, userID string) error {
+	docRef := db.userDocumentRef(userID)
+	_, err := docRef.Get(ctx)
+	if err != nil && status.Code(err) != codes.NotFound {
+		return err
+	}
+	if err != nil && status.Code(err) == codes.NotFound {
+		return err
+	}
+
+	if _, err := docRef.Delete(ctx); err != nil {
+		return err
+	}
 	return nil
 }
 
