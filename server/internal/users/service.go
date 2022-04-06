@@ -19,8 +19,8 @@ type Response struct {
 // in the rest api
 type UserResponse struct {
 	ID        string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
 	Role      string `json:"role"`
 }

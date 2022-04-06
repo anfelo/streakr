@@ -12,6 +12,7 @@ import (
 
 // UserDocument - struct that defines the firebase user document model
 type UserDocument struct {
+	ID        string `firestore:"id"`
 	FirstName string `firestore:"firstName"`
 	LastName  string `firestore:"lastName"`
 	Email     string `firestore:"email"`
@@ -47,14 +48,14 @@ func (d *Database) GetUserByID(ctx context.Context, userID string) (User, error)
 	if err != nil {
 		return User{}, err
 	}
-	user.ID = doc.Ref.ID
 	return user, nil
 }
 
 // CreateUser - method that creates a new user document
 func (d *Database) CreateUser(ctx context.Context, user User) (User, error) {
-	newDocRef := d.usersCollection().NewDoc()
+	newDocRef := d.userDocumentRef(user.ID)
 	userDoc := UserDocument{
+		ID:        user.ID,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -65,7 +66,6 @@ func (d *Database) CreateUser(ctx context.Context, user User) (User, error) {
 		return User{}, err
 	}
 
-	user.ID = newDocRef.ID
 	return user, nil
 }
 
@@ -97,7 +97,7 @@ func (d *Database) UpdateUser(
 		return User{}, err
 	}
 
-	return user, nil
+	return mapUserDocumentToUser(userDoc), nil
 }
 
 // DeleteUser - method that deletes a user document
@@ -111,4 +111,14 @@ func (db *Database) usersCollection() *firestore.CollectionRef {
 
 func (db *Database) userDocumentRef(userID string) *firestore.DocumentRef {
 	return db.usersCollection().Doc(userID)
+}
+
+func mapUserDocumentToUser(userDoc UserDocument) User {
+	return User{
+		ID:        userDoc.ID,
+		FirstName: userDoc.FirstName,
+		LastName:  userDoc.LastName,
+		Email:     userDoc.Email,
+		Role:      userDoc.Role,
+	}
 }
