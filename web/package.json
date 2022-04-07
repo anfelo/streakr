@@ -10,6 +10,8 @@
     "sass": "^1.50.0"
   },
   "dependencies": {
-    "bulma": "^0.9.3"
+    "bulma": "^0.9.3",
+    "firebase": "^9.6.10",
+    "jsonwebtoken": "^8.5.1"
   }
 }
