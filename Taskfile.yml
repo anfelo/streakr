@@ -7,11 +7,11 @@ tasks:
 
   test:
     cmds:
-      - go test -v ./...
+      - cd server && env $(cat "../.test.env" | xargs) go test -v ./...
 
   lint:
     cmds:
-      - golangci-lint run
+      - cd server && golangci-lint run
 
   run:
     cmds:
